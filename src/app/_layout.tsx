@@ -1,6 +1,7 @@
 import { Stack } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { View, StyleSheet, StatusBar } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useThemeStore } from '../store/useThemeStore';
 import { COLORS } from '../constants/theme';
 import { MiniPlayer } from '../components/MiniPlayer';
@@ -17,7 +18,8 @@ export default function Layout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <View style={[styles.container, { backgroundColor: isDark ? COLORS.backgroundDark : COLORS.backgroundLight }]}>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <View style={[styles.container, { backgroundColor: isDark ? COLORS.backgroundDark : COLORS.backgroundLight }]}>
         <StatusBar 
           barStyle={isDark ? 'light-content' : 'dark-content'} 
           backgroundColor="transparent" 
@@ -31,7 +33,8 @@ export default function Layout() {
           <Stack.Screen name="player" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
         </Stack>
         <MiniPlayer />
-      </View>
+        </View>
+      </GestureHandlerRootView>
     </QueryClientProvider>
   );
 }

@@ -6,6 +6,7 @@ import { Song } from '../types';
 import { useThemeStore } from '../store/useThemeStore';
 import { COLORS, SPACING, FONTS, RADIUS } from '../constants/theme';
 import { usePlayerStore } from '../store/usePlayerStore';
+import { AddToPlaylistModal } from './AddToPlaylistModal';
 
 interface SongListItemProps {
   song: Song;
@@ -19,6 +20,7 @@ export const SongListItem: React.FC<SongListItemProps> = ({ song, onPress, showI
   const { currentSong, isPlaying } = usePlayerStore();
 
   const isCurrent = currentSong?.id === song.id;
+  const [modalVisible, setModalVisible] = React.useState(false);
 
   return (
     <TouchableOpacity 
@@ -60,13 +62,19 @@ export const SongListItem: React.FC<SongListItemProps> = ({ song, onPress, showI
         </Text>
       </View>
 
-      <TouchableOpacity style={styles.moreButton}>
+      <TouchableOpacity style={styles.moreButton} onPress={() => setModalVisible(true)}>
         <MaterialIcons 
           name="more-vert" 
           size={24} 
           color={isDark ? COLORS.textMutedDark : COLORS.textMutedLight} 
         />
       </TouchableOpacity>
+      
+      <AddToPlaylistModal 
+        visible={modalVisible} 
+        onClose={() => setModalVisible(false)} 
+        song={song} 
+      />
     </TouchableOpacity>
   );
 };

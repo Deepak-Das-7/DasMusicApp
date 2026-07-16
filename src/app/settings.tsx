@@ -4,6 +4,7 @@ import { Header } from '../components/Header';
 import { useThemeStore } from '../store/useThemeStore';
 import { useHistoryStore } from '../store/useHistoryStore';
 import { useSearchStore } from '../store/useSearchStore';
+import { useRouter } from 'expo-router';
 import { COLORS, SPACING, FONTS, RADIUS } from '../constants/theme';
 import { MaterialIcons } from '@expo/vector-icons';
 
@@ -11,6 +12,7 @@ export default function Settings() {
   const { themeMode, setThemeMode } = useThemeStore();
   const { clearHistory } = useHistoryStore();
   const { clearSearches } = useSearchStore();
+  const router = useRouter();
   
   const isDark = themeMode === 'dark' || themeMode === 'system';
 
@@ -48,6 +50,17 @@ export default function Settings() {
       
       <View style={styles.content}>
         <Text style={[styles.sectionTitle, { color: isDark ? COLORS.primary : COLORS.secondary }]}>
+          Library
+        </Text>
+        
+        {renderSettingItem(
+          'My Playlists', 
+          'queue-music', 
+          <MaterialIcons name="chevron-right" size={24} color={isDark ? COLORS.textMutedDark : COLORS.textMutedLight} />,
+          () => router.push('/playlists')
+        )}
+
+        <Text style={[styles.sectionTitle, { color: isDark ? COLORS.primary : COLORS.secondary }]}>
           Preferences
         </Text>
         
@@ -77,6 +90,17 @@ export default function Settings() {
           'search', 
           <MaterialIcons name="chevron-right" size={24} color={isDark ? COLORS.textMutedDark : COLORS.textMutedLight} />,
           handleClearSearches
+        )}
+
+        <Text style={[styles.sectionTitle, { color: isDark ? COLORS.primary : COLORS.secondary }]}>
+          About
+        </Text>
+        
+        {renderSettingItem(
+          'About DasMusic', 
+          'info-outline', 
+          <MaterialIcons name="chevron-right" size={24} color={isDark ? COLORS.textMutedDark : COLORS.textMutedLight} />,
+          () => router.push('/about')
         )}
 
         <View style={styles.versionContainer}>

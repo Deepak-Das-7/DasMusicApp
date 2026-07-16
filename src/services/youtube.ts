@@ -57,6 +57,7 @@ export const youtubeService = {
         id: item.id,
         title: item.snippet.title,
         artist: item.snippet.channelTitle,
+        artistId: item.snippet.channelId,
         thumbnail: item.snippet.thumbnails.maxres?.url || item.snippet.thumbnails.high?.url || '',
         duration: item.contentDetails.duration, // Note: Needs ISO 8601 parsing later
         views: item.statistics.viewCount,
@@ -82,6 +83,7 @@ export const youtubeService = {
         id: item.id,
         title: item.snippet.title,
         artist: item.snippet.channelTitle,
+        artistId: item.snippet.channelId,
         thumbnail: item.snippet.thumbnails.high?.url || '',
         duration: item.contentDetails.duration,
         views: item.statistics.viewCount,
@@ -104,6 +106,73 @@ export const youtubeService = {
       return searchRes.songs.filter(s => s.id !== videoId);
     } catch (error) {
       console.error('Error fetching related songs:', error);
+      throw error;
+    }
+  },
+
+  async getArtistDetails(channelId: string) {
+    try {
+      const response = await api.get('/channels', {
+        params: {
+          part: 'snippet,statistics',
+          id: channelId,
+        },
+      });
+
+      if (response.data.items.length === 0) return null;
+
+      const channel = response.data.items[0];
+      return {
+        id: channel.id,
+        name: channel.snippet.title,
+        thumbnail: channel.snippet.thumbnails.high?.url || '',
+        description: channel.snippet.description,
+        subscriberCount: channel.statistics.subscriberCount,
+        viewCount: channel.statistics.viewCount,
+      };
+    } catch (error) {
+      console.error('Error fetching artist details:', error);
+      throw error;
+    }
+  },
+
+  async getArtistTopTracks(channelId: string): Promise<Song[]> {
+    try {
+      const response = await api.get<YouTubeSearchResponse>('/search', {
+        params: {
+          part: 'snippet',
+          channelId: channelId,
+          type: 'video',
+          videoCategoryId: '10',
+          maxResults: 10,
+          order: 'viewCount', // top tracks
+        },
+      });
+
+      const videoIds = response.data.items.map(item => item.id.videoId).filter(Boolean).join(',');
+      return await this.getVideoDetails(videoIds);
+    } catch (error) {
+      console.error('Error fetching artist top tracks:', error);
+      throw error;
+    }
+  },
+
+  async getAlbumTracks(albumQuery: string): Promise<Song[]> {
+    try {
+      const response = await api.get<YouTubeSearchResponse>('/search', {
+        params: {
+          part: 'snippet',
+          q: albumQuery + ' full album tracks',
+          type: 'video',
+          videoCategoryId: '10',
+          maxResults: 15,
+        },
+      });
+
+      const videoIds = response.data.items.map(item => item.id.videoId).filter(Boolean).join(',');
+      return await this.getVideoDetails(videoIds);
+    } catch (error) {
+      console.error('Error fetching album tracks:', error);
       throw error;
     }
   }

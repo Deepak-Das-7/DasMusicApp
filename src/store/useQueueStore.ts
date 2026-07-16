@@ -15,6 +15,9 @@ interface QueueState {
   toggleShuffle: () => void;
   toggleRepeat: () => void;
   clearQueue: () => void;
+  removeSong: (index: number) => void;
+  reorderQueue: (from: number, to: number) => void;
+  playAt: (index: number) => void;
 }
 
 export const useQueueStore = create<QueueState>((set, get) => ({
@@ -82,4 +85,57 @@ export const useQueueStore = create<QueueState>((set, get) => ({
   },
   
   clearQueue: () => set({ queue: [], currentIndex: -1 }),
+
+  removeSong: (index) => {
+    set((state) => {
+      const newQueue = [...state.queue];
+      newQueue.splice(index, 1);
+      
+      let newCurrentIndex = state.currentIndex;
+      // Adjust currentIndex if necessary
+      if (index < state.currentIndex) {
+        newCurrentIndex--;
+      } else if (index === state.currentIndex) {
+        // If the current song is removed, and there are more songs, 
+        // the index stays the same (plays the next song in line).
+        // If it was the last song, decrement index or clear it.
+        if (newQueue.length === 0) {
+          newCurrentIndex = -1;
+        } else if (newCurrentIndex >= newQueue.length) {
+          newCurrentIndex = newQueue.length - 1;
+        }
+      }
+      
+      return { queue: newQueue, currentIndex: newCurrentIndex };
+    });
+  },
+
+  reorderQueue: (from, to) => {
+    set((state) => {
+      const newQueue = [...state.queue];
+      const [movedSong] = newQueue.splice(from, 1);
+      newQueue.splice(to, 0, movedSong);
+      
+      let newCurrentIndex = state.currentIndex;
+      // Adjust currentIndex if the moved song was the current song or affected its position
+      if (from === state.currentIndex) {
+        newCurrentIndex = to;
+      } else if (from < state.currentIndex && to >= state.currentIndex) {
+        newCurrentIndex--;
+      } else if (from > state.currentIndex && to <= state.currentIndex) {
+        newCurrentIndex++;
+      }
+      
+      return { queue: newQueue, currentIndex: newCurrentIndex };
+    });
+  },
+
+  playAt: (index) => {
+    set((state) => {
+      if (index >= 0 && index < state.queue.length) {
+        return { currentIndex: index };
+      }
+      return state;
+    });
+  },
 }));

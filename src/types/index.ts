@@ -2,10 +2,18 @@ export interface Song {
   id: string;
   title: string;
   artist: string; // channel title
+  artistId?: string; // channelId
   thumbnail: string;
   duration: string; // ISO 8601 or parsed seconds
   views?: string;
   description?: string;
+}
+
+export interface Playlist {
+  id: string;
+  name: string;
+  songs: Song[];
+  createdAt: number;
 }
 
 export interface YouTubeSearchResponse {
@@ -20,6 +28,7 @@ export interface YouTubeSearchResult {
   snippet: {
     title: string;
     channelTitle: string;
+    channelId: string;
     thumbnails: {
       high?: { url: string };
       medium?: { url: string };
@@ -38,6 +47,7 @@ export interface YouTubeVideoDetail {
   snippet: {
     title: string;
     channelTitle: string;
+    channelId: string;
     thumbnails: {
       high?: { url: string };
       medium?: { url: string };

@@ -20,7 +20,7 @@ export default function Home() {
   const router = useRouter();
   const { history } = useHistoryStore();
   const { favourites } = useFavouriteStore();
-  const { setCurrentSong, setIsPlaying } = usePlayerStore();
+  const { currentSong, setCurrentSong, setIsPlaying } = usePlayerStore();
   const { setQueue } = useQueueStore();
   const { themeMode } = useThemeStore();
   const isDark = themeMode === 'dark' || themeMode === 'system';
@@ -30,9 +30,19 @@ export default function Home() {
     queryFn: () => youtubeService.getTrendingMusic(),
   });
 
+  // Generate a smart query for recommendations
+  let smartQuery = 'best new music';
+  if (currentSong) {
+    smartQuery = `${currentSong.artist} ${currentSong.title} similar songs`;
+  } else if (history.length > 0) {
+    smartQuery = `${history[0].artist} similar songs`;
+  } else if (favourites.length > 0) {
+    smartQuery = `${favourites[0].artist} top hits`;
+  }
+
   const { data: recommended, isLoading: recommendedLoading } = useQuery({
-    queryKey: ['recommended'],
-    queryFn: () => youtubeService.searchSongs('best new music 2026'),
+    queryKey: ['recommended', smartQuery],
+    queryFn: () => youtubeService.searchSongs(smartQuery),
   });
 
   const handlePlaySong = (song: Song, queue: Song[]) => {

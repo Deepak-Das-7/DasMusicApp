@@ -11,13 +11,17 @@ interface HeaderProps {
   showBack?: boolean;
   rightIcon?: keyof typeof MaterialIcons.glyphMap;
   onRightPress?: () => void;
+  leftIcon?: keyof typeof MaterialIcons.glyphMap;
+  onLeftPress?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   title = 'DasMusic',
   showBack = false,
   rightIcon,
-  onRightPress
+  onRightPress,
+  leftIcon,
+  onLeftPress
 }) => {
   const { themeMode } = useThemeStore();
   const isDark = themeMode === 'dark' || themeMode === 'system';
@@ -37,6 +41,17 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <MaterialIcons
               name="arrow-back"
+              size={28}
+              color={isDark ? COLORS.textLight : COLORS.textDark}
+            />
+          </TouchableOpacity>
+        ) : leftIcon ? (
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={onLeftPress}
+          >
+            <MaterialIcons
+              name={leftIcon}
               size={28}
               color={isDark ? COLORS.textLight : COLORS.textDark}
             />

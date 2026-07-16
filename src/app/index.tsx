@@ -88,6 +88,8 @@ export default function Home() {
         title="Good Morning"
         rightIcon="search"
         onRightPress={() => router.push('/search')}
+        leftIcon="people"
+        onLeftPress={() => router.push('/social')}
       />
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {renderHorizontalList(history.slice(0, 10), 'Recently Played', false, null)}

@@ -4,6 +4,7 @@ import { Header } from '../components/Header';
 import { useThemeStore } from '../store/useThemeStore';
 import { useHistoryStore } from '../store/useHistoryStore';
 import { useSearchStore } from '../store/useSearchStore';
+import { useAuthStore } from '../store/useAuthStore';
 import { useRouter } from 'expo-router';
 import { COLORS, SPACING, FONTS, RADIUS } from '../constants/theme';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -12,6 +13,7 @@ export default function Settings() {
   const { themeMode, setThemeMode } = useThemeStore();
   const { clearHistory } = useHistoryStore();
   const { clearSearches } = useSearchStore();
+  const { user, logout } = useAuthStore();
   const router = useRouter();
   
   const isDark = themeMode === 'dark' || themeMode === 'system';
@@ -49,6 +51,45 @@ export default function Settings() {
       <Header title="Settings" showBack />
       
       <View style={styles.content}>
+        
+        <Text style={[styles.sectionTitle, { color: isDark ? COLORS.primary : COLORS.secondary }]}>
+          Account
+        </Text>
+        
+        {user ? (
+          <>
+            {renderSettingItem(
+              `Logged in as ${user.name}`, 
+              'account-circle', 
+              <MaterialIcons name="check" size={24} color={COLORS.primary} />
+            )}
+            {renderSettingItem(
+              'Log Out', 
+              'logout', 
+              <MaterialIcons name="chevron-right" size={24} color={isDark ? COLORS.textMutedDark : COLORS.textMutedLight} />,
+              () => Alert.alert('Log Out', 'Are you sure you want to log out?', [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Log Out', style: 'destructive', onPress: logout }
+              ])
+            )}
+          </>
+        ) : (
+          <>
+            {renderSettingItem(
+              'Log In', 
+              'login', 
+              <MaterialIcons name="chevron-right" size={24} color={isDark ? COLORS.textMutedDark : COLORS.textMutedLight} />,
+              () => router.push('/login')
+            )}
+            {renderSettingItem(
+              'Sign Up', 
+              'person-add', 
+              <MaterialIcons name="chevron-right" size={24} color={isDark ? COLORS.textMutedDark : COLORS.textMutedLight} />,
+              () => router.push('/signup')
+            )}
+          </>
+        )}
+
         <Text style={[styles.sectionTitle, { color: isDark ? COLORS.primary : COLORS.secondary }]}>
           Library
         </Text>

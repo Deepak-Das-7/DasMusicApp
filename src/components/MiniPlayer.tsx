@@ -1,7 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import YoutubePlayer, { YoutubeIframeRef } from 'react-native-youtube-iframe';
 import { COLORS, FONTS, RADIUS, SPACING } from '../constants/theme';
@@ -15,6 +15,7 @@ export const MiniPlayer = () => {
   const { themeMode } = useThemeStore();
   const isDark = themeMode === 'dark' || themeMode === 'system';
   const router = useRouter();
+  const [isPlayerReady, setIsPlayerReady] = useState(false);
 
   // Initialize our custom debug-enabled controller hook
   const { currentVideoId, handlePlaybackStateChange } = useAudioPlayer();
@@ -33,7 +34,7 @@ export const MiniPlayer = () => {
   useEffect(() => {
     let interval: any;
 
-    if (isPlaying && playerRef.current) {
+    if (isPlaying && isPlayerReady && playerRef.current) {
       interval = setInterval(async () => {
         try {
           const currentTime = await playerRef.current?.getCurrentTime();
@@ -48,7 +49,7 @@ export const MiniPlayer = () => {
     }
 
     return () => clearInterval(interval);
-  }, [isPlaying, setPosition, setDuration]);
+  }, [isPlaying, isPlayerReady, setPosition, setDuration]);
 
   if (!currentSong) return null;
 
@@ -82,6 +83,7 @@ export const MiniPlayer = () => {
               play={isPlaying}
               videoId={currentVideoId}
               onChangeState={onStateChange}
+              onReady={() => setIsPlayerReady(true)}
               webViewProps={{
                 allowsInlineMediaPlayback: true,
                 mediaPlaybackRequiresUserAction: false,

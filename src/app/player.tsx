@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
 import { MaterialIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { Dimensions, StyleSheet, Text, TouchableOpacity, View, Share, Alert } from 'react-native';
+import { useState } from 'react';
+import { Alert, Dimensions, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { LyricsModal } from '../components/LyricsModal';
 import { PlayerControls } from '../components/PlayerControls';
 import { ProgressSlider } from '../components/ProgressSlider';
-import { LyricsModal } from '../components/LyricsModal';
 import { COLORS, FONTS, RADIUS, SPACING } from '../constants/theme';
 import { useFavouriteStore } from '../store/useFavouriteStore';
 import { usePlayerStore } from '../store/usePlayerStore';
@@ -23,15 +23,17 @@ export default function Player() {
   const { themeMode } = useThemeStore();
   const isDark = themeMode === 'dark' || themeMode === 'system';
   const [lyricsVisible, setLyricsVisible] = useState(false);
-  const [sleepTimerId, setSleepTimerId] = useState<NodeJS.Timeout | null>(null);
+  const [sleepTimerId, setSleepTimerId] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   const handleSleepTimer = () => {
     Alert.alert('Sleep Timer', 'Stop playback after:', [
-      { text: 'Off', onPress: () => {
-        if (sleepTimerId) clearTimeout(sleepTimerId);
-        setSleepTimerId(null);
-        Alert.alert('Timer Disabled', 'Sleep timer turned off.');
-      }},
+      {
+        text: 'Off', onPress: () => {
+          if (sleepTimerId) clearTimeout(sleepTimerId);
+          setSleepTimerId(null);
+          Alert.alert('Timer Disabled', 'Sleep timer turned off.');
+        }
+      },
       { text: '15 Mins', onPress: () => startTimer(15) },
       { text: '30 Mins', onPress: () => startTimer(30) },
       { text: '1 Hour', onPress: () => startTimer(60) },
@@ -109,7 +111,7 @@ export default function Player() {
             <Text style={[styles.title, { color: isDark ? COLORS.textLight : COLORS.textDark }]} numberOfLines={1}>
               {currentSong.title}
             </Text>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => currentSong.artistId && router.push(`/artist/${currentSong.artistId}`)}
               disabled={!currentSong.artistId}
             >
@@ -129,24 +131,24 @@ export default function Player() {
 
         <ProgressSlider />
         <PlayerControls />
-        
+
         <View style={styles.extraControlsRow}>
-          <TouchableOpacity 
-            style={styles.extraButton} 
+          <TouchableOpacity
+            style={styles.extraButton}
             onPress={() => setLyricsVisible(true)}
           >
             <MaterialIcons name="lyrics" size={24} color={COLORS.white} />
             <Text style={styles.extraButtonText}>Lyrics</Text>
           </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.extraButton} 
+          <TouchableOpacity
+            style={styles.extraButton}
             onPress={() => Share.share({ message: `Check out ${currentSong.title} by ${currentSong.artist}:\nhttps://music.youtube.com/watch?v=${currentSong.id}` })}
           >
             <MaterialIcons name="share" size={24} color={COLORS.white} />
             <Text style={styles.extraButtonText}>Share</Text>
           </TouchableOpacity>
-          <TouchableOpacity 
-            style={[styles.extraButton, sleepTimerId ? { backgroundColor: COLORS.primary } : {}]} 
+          <TouchableOpacity
+            style={[styles.extraButton, sleepTimerId ? { backgroundColor: COLORS.primary } : {}]}
             onPress={handleSleepTimer}
           >
             <MaterialIcons name="timer" size={24} color={COLORS.white} />
@@ -154,11 +156,11 @@ export default function Player() {
           </TouchableOpacity>
         </View>
       </View>
-      
-      <LyricsModal 
-        visible={lyricsVisible} 
-        onClose={() => setLyricsVisible(false)} 
-        song={currentSong} 
+
+      <LyricsModal
+        visible={lyricsVisible}
+        onClose={() => setLyricsVisible(false)}
+        song={currentSong}
       />
     </View>
   );

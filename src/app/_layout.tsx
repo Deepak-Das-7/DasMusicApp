@@ -5,16 +5,12 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useThemeStore } from '../store/useThemeStore';
 import { COLORS } from '../constants/theme';
 import { MiniPlayer } from '../components/MiniPlayer';
-import { useAudioPlayer } from '../hooks/useAudioPlayer';
 
 const queryClient = new QueryClient();
 
 export default function Layout() {
   const { themeMode } = useThemeStore();
   const isDark = themeMode === 'dark' || themeMode === 'system';
-  
-  // Initialize the audio engine at root level so it stays alive across screens
-  useAudioPlayer();
 
   return (
     <QueryClientProvider client={queryClient}>
